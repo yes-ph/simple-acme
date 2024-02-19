@@ -8,12 +8,12 @@ import (
 
 	"github.com/go-acme/lego/v4/certcrypto"
 	"github.com/go-acme/lego/v4/certificate"
+	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/lego"
-	"github.com/go-acme/lego/v4/providers/dns/route53"
 	"github.com/go-acme/lego/v4/registration"
 )
 
-func GenerateCertificate(email string, CADirURL string, domains []string) error {
+func GenerateCertificate(provider challenge.Provider, email string, CADirURL string, domains []string) error {
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		log.Fatal(err)
@@ -34,10 +34,6 @@ func GenerateCertificate(email string, CADirURL string, domains []string) error 
 		return err
 	}
 
-	provider, err := route53.NewDNSProvider()
-	if err != nil {
-		return err
-	}
 	err = client.Challenge.SetDNS01Provider(provider)
 	if err != nil {
 		return err
