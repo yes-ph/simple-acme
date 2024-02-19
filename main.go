@@ -13,7 +13,7 @@ import (
 	"github.com/go-acme/lego/v4/registration"
 )
 
-func GenerateCertificate(email string, CADirURL string, domains []string) {
+func GenerateCertificate(email string, CADirURL string, domains []string) error {
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		log.Fatal(err)
@@ -31,21 +31,21 @@ func GenerateCertificate(email string, CADirURL string, domains []string) {
 
 	client, err := lego.NewClient(config)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	provider, err := route53.NewDNSProvider()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	err = client.Challenge.SetDNS01Provider(provider)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	reg, err := client.Registration.Register(registration.RegisterOptions{TermsOfServiceAgreed: true})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	user.registration = reg
 
@@ -55,11 +55,13 @@ func GenerateCertificate(email string, CADirURL string, domains []string) {
 	}
 	certificate, err := client.Certificate.Obtain(request)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	err = writeCertificate(certificate)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
+
+	return nil
 }
