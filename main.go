@@ -13,7 +13,7 @@ import (
 	"github.com/go-acme/lego/v4/registration"
 )
 
-func GenerateCertificate(provider challenge.Provider, email string, CADirURL string, domains []string) error {
+func GenerateCertificate(provider challenge.Provider, email string, CADirURL string, domains []string, certificateFilename string, privateKeyFilename string, formatString string) error {
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		log.Fatal(err)
@@ -54,7 +54,7 @@ func GenerateCertificate(provider challenge.Provider, email string, CADirURL str
 		return err
 	}
 
-	err = writeCertificate(certificate)
+	err = writeCertificate(certificate, certificateFilename, privateKeyFilename, formatString)
 	if err != nil {
 		return err
 	}
