@@ -4,23 +4,36 @@
 
 # Usage
 
-    environment := os.Getenv("ENVIRONMENT")
+	import "github.com/go-acme/lego/v4/providers/dns/digitalocean"
 
-	CADirURL := lego.LEDirectoryStaging
+	func main() {
+		environment := os.Getenv("ENVIRONMENT")
 
-	if environment == "production" {
-		CADirURL = lego.LEDirectoryProduction
-	}
+		CADirURL := lego.LEDirectoryStaging
 
-	simple_acme.GenerateCertificate(
-		"email@example.com",
-		CADirURL,
-		[]string{
-			"example.com",
-			"*.example.com",
-		},
-	)
+		if environment == "production" {
+			CADirURL = lego.LEDirectoryProduction
+		}
 
-	if err != nil {
-		log.Fatal(err)
+		provider, err := digitalocean.NewDNSProvider()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = simple_acme.GenerateCertificate(
+			provider,
+			"email@example.com",
+			CADirURL,
+			[]string{
+				"example.com",
+				"*.example.com",
+			},
+			"tls.crt",
+			"tls.key",
+			"",
+		)
+
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
